@@ -11,7 +11,7 @@ def relax_adjustment(weights, rootnode, current_cumulative_distance):
 	tentative_predecessor = rootnode
 	adjustment_function = functools.partial(min, (tentative_predecessor, tentative_predecessor))
 
-def relax(node, neighbor_kv, weights)
+def relax_one(node, neighbor_kv, weights)
 	###careful: the haskell version graph structure returns something like
 	### graph[node]-> [('a',3),('b',4)] whereas ours returns {'a':3, 'b':4}
 	neighbor_weight = neighbor_kv[1]
@@ -29,7 +29,10 @@ def dijkstraStep(graph, weights, unvisited_keys):
 	if not unvisited_keys:
 		return weights
 	else:
-		
+		current_node = get_minweighted_unvisited_key(weights, unvisited_keys)
+		neighbors_of_current = graph[current_node]
+
+
 def get_minweighted_unvisited_key(weights, unvisited_keys):
 	"""from the weight dictionary return the key corresponding
 	to the minimum weight"""
