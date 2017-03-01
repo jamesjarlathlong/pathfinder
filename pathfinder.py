@@ -1,5 +1,10 @@
 import copy
 import functools
+def get_minweighted_unvisited_key(weights, unvisited_keys):
+	"""from the weight dictionary return the key corresponding
+	to the minimum weight"""
+	candidate_weights = {k:v for k,v in weights.items() if k in unvisited_keys}
+	return min(candidate_weights, key=lambda k: candidate_weights[k][0])
 
 def adjust(adjust_function, kv, k):
     new_kv = copy.deepcopy(kv)
@@ -9,15 +14,26 @@ def adjust(adjust_function, kv, k):
 def relax_adjustment(weights, rootnode, current_cumulative_distance):
 	tentative_distance = weights[rootnode][0] + current_cumulative_distance
 	tentative_predecessor = rootnode
-	adjustment_function = functools.partial(min, (tentative_predecessor, tentative_predecessor))
+	adjustment_function = functools.partial(min, (tentative_distance, tentative_predecessor))
+	return adjustment_function
 
-def relax_one(node, neighbor_kv, weights)
-	###careful: the haskell version graph structure returns something like
-	### graph[node]-> [('a',3),('b',4)] whereas ours returns {'a':3, 'b':4}
+def relax_one(node, weights, neighbor_kv):
+	print('neighbor_kv: ', neighbor_kv)
 	neighbor_weight = neighbor_kv[1]
 	neighbor_name = neighbor_kv[0]
-	adjuster = functools.partial(relax_adjustment, weights, node, neighbor_weight)
+	adjuster = relax_adjustment(weights, node, neighbor_weight)
 	return adjust(adjuster, weights, neighbor_name)
+
+def relax_all_neighbors(current_node, weights, neighbor_weights):
+	"""the pythonic way"""
+	new_weights = weights
+	for neighbor_name_weight in neighbor_weights:
+		new_weights = relax_one(current_node, neighbor_name_weight, new_weights)
+	return new_weights
+
+def relax_the_neighbors(current_node, neighbor_distances, weights):
+	relaxer = functools.partial(relax_one, current_node)
+	return functools.reduce(relaxer, neighbor_distances, weights)
 
 def weight_builder(source_node, graph):
 	"""builds the initial weight data structure based on the graph and
@@ -25,16 +41,27 @@ def weight_builder(source_node, graph):
 	while all others have infinite weight"""
 	return {key: (0 if key==source_node else float("inf"), None) for key in graph}
 
-def dijkstraStep(graph, weights, unvisited_keys):
+def dijkstra_step(graph, weights, unvisited_keys):
 	if not unvisited_keys:
+		print('no more to visit: ', weights)
 		return weights
 	else:
 		current_node = get_minweighted_unvisited_key(weights, unvisited_keys)
-		neighbors_of_current = graph[current_node]
+		neighbors_of_current = [(k,v) for k,v in graph[current_node].items()]
+		relaxed_weights = relax_the_neighbors(current_node, neighbors_of_current, weights)
+		unvisited_keys.remove(current_node)
+		return dijkstra_step(graph, relaxed_weights, unvisited_keys)
+def run_dijkstra(source, graph):
+	initial_weights = weight_builder(source, graph)
+	initial_unvisited = [k for k in graph]
+	dijkstra_stepper = functools.partial(dijkstra_step, graph)
+	final_weight_tree = dijkstra_stepper(initial_weights, initial_unvisited)
+	print('tree is: ', final_weight_tree)
+	return final_weight_tree
+
+def shortest_path_from_tree(tree, source, destination):
+
+	
 
 
-def get_minweighted_unvisited_key(weights, unvisited_keys):
-	"""from the weight dictionary return the key corresponding
-	to the minimum weight"""
-	candidate_weights = {k:v for k,v in weights.items() if k in unvisited_keys}
-	return min(candidate_weights, key=lambda k: candidate_weights[k][0])
+
