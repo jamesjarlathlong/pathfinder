@@ -43,7 +43,6 @@ def weight_builder(source_node, graph):
 
 def dijkstra_step(graph, weights, unvisited_keys):
 	if not unvisited_keys:
-		print('no more to visit: ', weights)
 		return weights
 	else:
 		current_node = get_minweighted_unvisited_key(weights, unvisited_keys)
@@ -56,11 +55,17 @@ def run_dijkstra(source, graph):
 	initial_unvisited = [k for k in graph]
 	dijkstra_stepper = functools.partial(dijkstra_step, graph)
 	final_weight_tree = dijkstra_stepper(initial_weights, initial_unvisited)
-	print('tree is: ', final_weight_tree)
 	return final_weight_tree
 
-def shortest_path_from_tree(tree, source, destination):
+def get_parent(node, tree):
+	return tree[node][1]
 
+def shortest_path_from_tree(tree, destination):
+	parent = get_parent(destination, tree)
+	if not parent:
+		return [destination]
+	else:
+		return [destination] + shortest_path_from_tree(tree, parent)
 	
 
 
