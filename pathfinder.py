@@ -66,6 +66,14 @@ def shortest_path_from_tree(tree, destination):
 		return [destination]
 	else:
 		return [destination] + shortest_path_from_tree(tree, parent)
+
+def just_weights(tree):
+	"""tree looks like  {'b': (17, 'd'), 'a': (0, None), 'e': (7, 'c'), 'd': (9, 'c'), 'c': (2, 'a')}
+	we return just {'b':17, 'e':7...}"""
+	return {k:v[0] for k,v in tree.items() if v[0]}
+
+def connect_full(graph):
+	return {k: just_weights(run_dijkstra(k, graph)) for k in graph}
 	
 
 
